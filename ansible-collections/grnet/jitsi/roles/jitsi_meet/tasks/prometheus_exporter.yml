@@ -1,0 +1,28 @@
+---
+
+- name: Clone prometheus-jitsi-meet-exporter
+  git:
+    repo: https://github.com/systemli/prometheus-jitsi-meet-exporter.git
+    dest: /opt/prometheus-jitsi-meet-exporter
+    version: "{{ jitsi_prometheus_jitsi_meet_exporter_release_number }}"
+  notify:
+    - Build prometheus-jitsi-meet-exporter
+
+- name: Create prometheus-jitsi-meet-exporter service
+  template:
+    src: jitsi-prometheus-jitsi-meet-exporter.service
+    dest: /etc/systemd/system/jitsi-prometheus-jitsi-meet-exporter.service
+  notify: Restart prometheus-jitsi-meet-exporter
+
+- name: Enable prometheus-jitsi-meet-exporter service
+  service:
+    name: jitsi-prometheus-jitsi-meet-exporter
+    enabled: yes
+
+# Continue from here
+# The problem now seems to be that the exporter gets its data from the JVB, not
+# from Jicofo, and we have two JVBs. This is quite stupid for the purpose we
+# want it. It might make sense for the sysadmin to know how his JVBs are doing,
+# but not for the company admin who wants to know how the system is being used.
+# Obviously if we want to use that exporter we'll need to move all this code to
+# the jitsi_jvb role.

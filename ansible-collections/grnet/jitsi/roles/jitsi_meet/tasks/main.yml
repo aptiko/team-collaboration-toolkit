@@ -17,6 +17,7 @@
       - nodejs
       - make
       - unzip
+      - golang  # For prometheus exporter
     autoremove: true
 
 - include_tasks: create_certificates.yml

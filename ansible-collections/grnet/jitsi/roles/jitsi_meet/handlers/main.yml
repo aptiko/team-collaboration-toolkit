@@ -17,3 +17,8 @@
     chdir: /opt/jitsi-meet
   async: 1000
   poll: 10
+
+- name: Build prometheus-jitsi-meet-exporter
+  command:
+    cmd: go build -o prometheus-jitsi-meet-exporter main.go
+    chdir: /opt/prometheus-jitsi-meet-exporter

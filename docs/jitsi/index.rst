@@ -19,7 +19,7 @@ and the ``jitsi_jvb`` role to the servers in the ``jitsi_jvb`` groupl
 
 Although in principle nginx, jitsi-meet, prosody and jicofo could reside
 in different machines, the role ``jitsi_meet`` puts them all in a single
-server.
+server. It also adds a prometheus node exporter in the same machine.
 
 Variables example
 =================
@@ -35,6 +35,8 @@ idea to vault the passwords/secrets. Here is an example::
     jitsi_jvb_password: topsecret3
     jitsi_jvb_secret: topsecret4
     jitsi_prosody_external_service_secret: topsecret5
+    prometheus_server_ips:
+      - 1.2.3.4
 
 Playbook
 ========
@@ -143,6 +145,8 @@ Variables and options
 - ``jitsi_ldap_*``: See :ref:`ldap`.
 - ``jitsi_prosody_external_service_secret``: The secret for external
   services (e.g. for TURN).
+- ``prometheus_server_ips``: See
+  https://aptikogeneral.readthedocs.io/en/latest/prometheus.html.
 
 .. _jitsi multi-user chat documentation: https://github.com/jitsi/jitsi-videobridge/blob/master/doc/muc.md
 

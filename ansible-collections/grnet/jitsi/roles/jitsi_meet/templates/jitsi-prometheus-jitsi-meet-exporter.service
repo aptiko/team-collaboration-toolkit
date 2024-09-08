@@ -1,0 +1,8 @@
+[Unit]
+Description=Prometheus Jitsi Meet Exporter
+
+[Service]
+ExecStart=/opt/prometheus-jitsi-meet-exporter/prometheus-jitsi-meet-exporter -videobridge-url https://localhost:8080/metrics/
+
+[Install]
+WantedBy=multi-user.target
