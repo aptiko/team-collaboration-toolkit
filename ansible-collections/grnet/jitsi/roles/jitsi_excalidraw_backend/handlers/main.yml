@@ -1,0 +1,12 @@
+---
+
+- name: Build jitsi-excalidraw-backend
+  command: npm run build
+  args:
+    chdir: /opt/jitsi-excalidraw-backend
+
+- name: Restart jitsi-excalidraw-backend
+  service:
+    name: jitsi-excalidraw-backend
+    daemon-reload: true
+    state: restarted

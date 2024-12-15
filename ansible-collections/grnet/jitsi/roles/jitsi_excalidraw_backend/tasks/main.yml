@@ -1,0 +1,41 @@
+---
+
+- name: Install apt packages required for excalidraw-backend
+  apt:
+    name:
+     - git
+     - nodejs
+
+- name: Clone jitsi excalidraw-backend
+  git:
+    repo: https://github.com/jitsi/excalidraw-backend.git
+    dest: /opt/jitsi-excalidraw-backend
+    version: x21
+  notify:
+    - Build jitsi-excalidraw-backend
+
+- name: Install excalidraw-backend dependencies
+  community.general.npm:
+    path: /opt/jitsi-excalidraw-backend
+  notify:
+    - Build jitsi-excalidraw-backend
+
+- name: Create group excalidraw
+  group:
+    name: excalidraw
+
+- name: Create user excalidraw
+  user:
+    name: excalidraw
+    group: excalidraw
+
+- name: Create jitsi-excalidraw-backend service
+  copy:
+    src: jitsi-excalidraw-backend.service
+    dest: /etc/systemd/system/jitsi-excalidraw-backend.service
+  notify: Restart jitsi-excalidraw-backend
+
+- name: Enable jitsi-excalidraw-backend service
+  service:
+    name: jitsi-excalidraw-backend
+    enabled: yes

@@ -1,0 +1,10 @@
+[Unit]
+Description=Jitsi Excalidraw Backend
+
+[Service]
+User=excalidraw
+ExecStart=npm start
+WorkingDirectory=/opt/jitsi-excalidraw-backend
+
+[Install]
+WantedBy=multi-user.target
