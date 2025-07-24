@@ -1,8 +1,23 @@
 ---
-
+ 
 - name: Install apt packages required for coturn
   apt:
-    name: coturn
+    name:
+      - coturn
+      - ssl-cert
+      - certbot
+
+- name: Check if letsencrypt certificate exists
+  stat:
+    path: /etc/letsencrypt/live/{{ coturn_fqdn }}
+  register: letsencryptdir
+
+- name: Ensure ferm allows certbot
+  meta: flush_handlers
+
+- name: Install letsencrypt certificate
+  command: certbot certonly --standalone --non-interactive --agree-tos -m {{ letsencrypt_admin }} -d {{ coturn_fqdn }}
+  when: letsencrypt and not letsencryptdir.stat.exists
 
 - name: Allow firewall for STUN and TURN
   lineinfile:
