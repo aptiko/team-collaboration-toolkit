@@ -15,3 +15,8 @@ nextcloud_assistant_background_worker: false
 nextcloud_mail_smtpmode: smtp
 nextcloud_apps: []
 nextcloud_mysql_fqdn: localhost
+
+nextcloud_notify_push_arch_map:
+  x86_64: x86_64
+  aarch64: aarch64
+  armv7l: arm7
