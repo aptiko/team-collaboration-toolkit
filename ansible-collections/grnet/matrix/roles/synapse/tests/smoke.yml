@@ -5,6 +5,8 @@
   hosts: all
   become: true
   gather_facts: false
+  vars_files:
+    - ../defaults/main.yml
   tasks:
     - name: Read the virtual environment configuration
       ansible.builtin.slurp:
@@ -28,3 +30,14 @@
       ansible.builtin.assert:
         that:
           - synapse_running.json.server_version == synapse_version
+
+    - name: Check the public Matrix endpoint through the reverse proxy
+      ansible.builtin.uri:
+        url: "{{ synapse_public_baseurl.rstrip('/') }}/_matrix/client/versions"
+        validate_certs: "{{ synapse_ssl != 'self-signed' }}"
+      register: synapse_public
+
+    - name: Check the proxy returned the Matrix versions response
+      ansible.builtin.assert:
+        that:
+          - synapse_public.json.versions | length > 0

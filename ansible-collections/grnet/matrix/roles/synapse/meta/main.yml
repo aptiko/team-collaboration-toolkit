@@ -1,6 +1,11 @@
 ---
 dependencies:
   - role: aptiko.general.postgresql
+  - role: aptiko.general.webserver
+  - role: aptiko.general.website
+    website_domain: "{{ synapse_fqdn }}"
+    website_document_root: "/var/www/{{ synapse_fqdn }}"
+    website_ssl: "{{ synapse_ssl }}"
 
 galaxy_info:
   author: Antonis Christofides

@@ -19,11 +19,18 @@ The PostgreSQL dependency also installs PostGIS and requires the
 configured ``aptiko.general.duply`` installation; set
 ``duply_deactivate: true`` if backups are managed separately.
 
-Synapse listens on localhost port 8008 with registration disabled. Set up
-an HTTPS reverse proxy separately, forwarding ``/_matrix`` and
-``/_synapse/client`` and the ``X-Forwarded-For`` and ``X-Forwarded-Proto``
-headers. Federation and client discovery must also be configured separately
-when the public hostname differs from the server name.
+Synapse listens on localhost port 8008 with registration disabled. The role
+installs an Apache or nginx reverse proxy through ``aptiko.general.webserver``
+and ``aptiko.general.website``, forwarding ``/_matrix`` and ``/_synapse/client``
+with the required headers and preserving encoded request paths. The admin API
+is not proxied. HTTPS uses Let's Encrypt by default; DNS must point to the
+server and ports 80 and 443 must be reachable for certificate issuance.
+
+Federation discovery must direct other servers to ``synapse_fqdn:443`` (for
+example, through ``https://<synapse_server_name>/.well-known/matrix/server``).
+The role does not listen on the default federation port 8448 or configure
+discovery on the server-name domain. Client discovery on that domain must
+also be configured separately when needed.
 
 The role manages ``/etc/opt/synapse/homeserver.yaml`` and the ``matrix-synapse``
 systemd service, which runs as the ``matrix-synapse`` user. Logs go to the
@@ -41,7 +48,9 @@ With the passwords defined in vaulted inventory variables::
     vars:
       synapse_version: "1.159.0"
       synapse_server_name: example.org
-      synapse_public_baseurl: https://matrix.example.org/
+      synapse_fqdn: matrix.example.org
+      webserver_type: nginx
+      website_letsencrypt_admin: admin@example.org
       duply_deactivate: true
     roles:
       - grnet.matrix.synapse
@@ -74,7 +83,28 @@ Parameters
 
 .. data:: synapse_public_baseurl
 
-   Public HTTPS URL. Defaults to ``https://{{ synapse_server_name }}/``.
+   Public URL. Defaults to ``https://{{ synapse_fqdn }}/`` (HTTP when
+   ``synapse_ssl`` is ``"off"``).
+
+.. data:: synapse_fqdn
+
+   Public reverse proxy hostname. Defaults to ``synapse_server_name``.
+
+.. data:: synapse_ssl
+
+   TLS mode passed to ``aptiko.general.website``. Default ``"letsencrypt"``;
+   also accepts ``"self-signed"``, ``"custom"`` and ``"off"``. Custom TLS
+   requires ``website_cert`` and ``website_private_key`` as defined by that role.
+
+.. data:: webserver_type
+
+   Required. Set to ``"nginx"`` or ``"apache"``. This selects the shared
+   web server for the host, as in ``aptiko.general.webserver``.
+
+.. data:: website_letsencrypt_admin
+
+   Required for the default Let's Encrypt mode. Email address used for
+   certificate registration.
 
 .. data:: synapse_report_stats
 

@@ -1,5 +1,7 @@
 ---
-synapse_public_baseurl: "https://{{ synapse_server_name }}/"
+synapse_fqdn: "{{ synapse_server_name }}"
+synapse_ssl: letsencrypt
+synapse_public_baseurl: "{{ 'http' if synapse_ssl == 'off' else 'https' }}://{{ synapse_fqdn }}/"
 synapse_report_stats: false
 synapse_database_name: synapse
 synapse_database_user: synapse

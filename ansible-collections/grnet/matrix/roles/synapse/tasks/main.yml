@@ -139,7 +139,16 @@
     mode: "0644"
   notify: Restart Synapse
 
-- name: Apply Synapse configuration before starting the service
+- name: Configure the Synapse reverse proxy
+  ansible.builtin.template:
+    src: "synapse.{{ webserver_type }}.conf.j2"
+    dest: "/etc/{{ 'apache2' if webserver_type == 'apache' else 'nginx' }}/snippets/{{ synapse_fqdn }}/synapse.conf"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: "{{ 'Restart web server' if webserver_type == 'apache' else 'Reload web server' }}"
+
+- name: Apply Synapse and reverse proxy configuration
   ansible.builtin.meta: flush_handlers
 
 - name: Enable and start Synapse
