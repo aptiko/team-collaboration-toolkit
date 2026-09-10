@@ -1,0 +1,30 @@
+---
+# Run against a deployed host with synapse_version defined in inventory:
+# ansible-playbook -i INVENTORY smoke.yml --limit HOST
+- name: Check the installed Synapse service
+  hosts: all
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Read the virtual environment configuration
+      ansible.builtin.slurp:
+        src: /opt/synapse/venv/pyvenv.cfg
+      register: synapse_venv_config
+
+    - name: Check that distribution packages are visible
+      ansible.builtin.assert:
+        that:
+          - "'include-system-site-packages = true' in (synapse_venv_config.content | b64decode)"
+
+    - name: Query the running Synapse version
+      ansible.builtin.uri:
+        url: http://127.0.0.1:8008/_synapse/admin/v1/server_version
+      register: synapse_running
+      until: synapse_running.status == 200
+      retries: 12
+      delay: 5
+
+    - name: Check the running version matches inventory
+      ansible.builtin.assert:
+        that:
+          - synapse_running.json.server_version == synapse_version
