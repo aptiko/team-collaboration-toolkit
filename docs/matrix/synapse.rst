@@ -19,9 +19,12 @@ The PostgreSQL dependency also installs PostGIS and requires the
 configured ``aptiko.general.duply`` installation; set
 ``duply_deactivate: true`` if backups are managed separately.
 
+The playbook must explicitly run ``aptiko.general.webserver`` before this role
+to install the shared Apache or nginx web server.
+
 Synapse listens on localhost port 8008 with registration disabled. The role
-installs an Apache or nginx reverse proxy through ``aptiko.general.webserver``
-and ``aptiko.general.website``, forwarding ``/_matrix`` and ``/_synapse/client``
+configures a reverse proxy through ``aptiko.general.website``,
+forwarding ``/_matrix`` and ``/_synapse/client``
 with the required headers and preserving encoded request paths. The admin API
 is not proxied. HTTPS uses Let's Encrypt by default; DNS must point to the
 server and ports 80 and 443 must be reachable for certificate issuance.
@@ -53,6 +56,7 @@ With the passwords defined in vaulted inventory variables::
       website_letsencrypt_admin: admin@example.org
       duply_deactivate: true
     roles:
+      - aptiko.general.webserver
       - grnet.matrix.synapse
 
 Parameters
