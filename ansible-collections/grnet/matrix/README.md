@@ -10,3 +10,12 @@ The role configures an Apache or nginx reverse proxy using
 
 See the [role documentation](https://team-collaboration-toolkit.readthedocs.io/en/latest/matrix/synapse.html)
 for prerequisites, variables and an example playbook.
+
+The `grnet.matrix.element` role installs an explicitly selected prebuilt Element
+Web release and configures its default homeserver. It includes
+`aptiko.general.website` as a dependency; the playbook must run
+`aptiko.general.webserver` explicitly beforehand. Element must use a different
+hostname from the homeserver, even on the same machine.
+
+See the [Element role documentation](https://team-collaboration-toolkit.readthedocs.io/en/latest/matrix/element.html)
+for parameters and a combined Synapse and Element playbook.
