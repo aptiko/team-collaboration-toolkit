@@ -66,9 +66,13 @@ Parameters
 
 .. data:: synapse_version
 
-   Required, with no default. Exact PyPI release as a quoted string, for
-   example ``"1.159.0"``. Change it and rerun the role to install another
-   version and restart Synapse. Normal APT upgrades do not upgrade Synapse,
+   Required, with no default. A quoted PyPI version or version specifier, for
+   example ``"1.159.0"``, ``"==1.159.0"`` or ``">=1.159,<1.160"``. Pip validates
+   the specifier and selects a matching release. An already installed version
+   satisfying the constraint is kept; rerunning the role does not automatically
+   upgrade to the newest matching release. Change the constraint to require
+   another version and rerun the role to install it and restart Synapse.
+   Normal APT upgrades do not upgrade Synapse,
    but can update its system-provided Python dependencies. Pip dependencies
    are not locked. Review Synapse's upgrade notes and back up before upgrading;
    selecting an older version does not undo database migrations.
@@ -160,7 +164,7 @@ Parameters
 .. data:: synapse_ldap
 
    LDAP provider configuration. Default ``{}`` (LDAP login disabled). A nonempty
-   mapping installs ``matrix-synapse-ldap3>=0.3.0`` in the Synapse virtual
+   mapping installs ``matrix-synapse-ldap3`` at ``synapse_ldap_version`` in the Synapse virtual
    environment and enables its ``LdapAuthProviderModule``. The role sets the
    provider's ``enabled`` flag automatically. Set the mapping back to ``{}``
    and rerun the role to disable LDAP login; the package remains installed.
@@ -168,6 +172,7 @@ Parameters
    Configure ``uri``, ``base`` and the ``uid``, ``mail`` and ``name`` attribute
    mappings. For example, using a service account to search the directory::
 
+      synapse_ldap_version: ">=0.3.0,<0.4.0"
       synapse_ldap:
         uri: ldap://ldap.example.org:389
         start_tls: true
@@ -196,6 +201,14 @@ Parameters
 
    The provider is in maintenance mode and is incompatible with Matrix
    Authentication Service (MAS). This role uses Synapse's built-in authentication.
+
+.. data:: synapse_ldap_version
+
+   Required when ``synapse_ldap`` is nonempty, with no default. A quoted version
+   or version specifier for ``matrix-synapse-ldap3``, for example ``"0.3.0"`` or
+   ``">=0.3.0,<0.4.0"``. Uses the same installation behavior as
+   ``synapse_version``. Select a release supporting ``LdapAuthProviderModule``
+   and compatible with your Synapse and Python versions.
 
 .. data:: synapse_database_name
    synapse_database_user

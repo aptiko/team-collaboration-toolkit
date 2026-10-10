@@ -3,7 +3,10 @@
 The `grnet.matrix.synapse` role installs an explicitly selected Synapse version
 with pip in `/opt/synapse/venv`, reusing distribution Python packages through
 `--system-site-packages`. It configures a local PostgreSQL database.
-The `synapse_version` parameter is required. The playbook must explicitly run
+The `synapse_version` parameter is required and accepts an exact version or a
+range such as `">=1.159,<1.160"`. LDAP login also requires `synapse_ldap_version`,
+which accepts the same version syntax for `matrix-synapse-ldap3`.
+The playbook must explicitly run
 `aptiko.general.postgresql` and `aptiko.general.webserver` before this role.
 The role configures an Apache or nginx reverse proxy using
 `aptiko.general.website`, with Let's Encrypt TLS by default.

@@ -6,7 +6,7 @@
       - synapse_database_password | default('') | length > 0
       - synapse_version is defined
       - synapse_version is string
-      - synapse_version is match('^[0-9]+\.[0-9]+\.[0-9]+([a-zA-Z0-9.+-]*)$')
+      - synapse_version | trim | length > 0
     fail_msg: Set synapse_server_name, synapse_version and synapse_database_password.
   no_log: true
 
@@ -31,7 +31,10 @@
       - synapse_ldap.attributes.uid | default('') | length > 0
       - synapse_ldap.attributes.mail | default('') | length > 0
       - synapse_ldap.attributes.name | default('') | length > 0
-    fail_msg: Set synapse_ldap uri, base and attributes (uid, mail and name).
+      - synapse_ldap_version is defined
+      - synapse_ldap_version is string
+      - synapse_ldap_version | trim | length > 0
+    fail_msg: Set synapse_ldap_version and synapse_ldap uri, base and attributes (uid, mail and name).
   when: synapse_ldap | length > 0
   no_log: true
 
@@ -127,7 +130,8 @@
 
 - name: Install the Synapse LDAP authentication provider
   ansible.builtin.pip:
-    name: matrix-synapse-ldap3>=0.3.0
+    name: matrix-synapse-ldap3
+    version: "{{ synapse_ldap_version }}"
     virtualenv: /opt/synapse/venv
     umask: "0022"
   when: synapse_ldap | length > 0
