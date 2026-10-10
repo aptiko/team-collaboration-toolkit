@@ -157,6 +157,46 @@ Parameters
    Store the SMTP password in Ansible Vault. For implicit TLS (usually port
    465), set ``force_tls: true`` instead of ``require_transport_security``.
 
+.. data:: synapse_ldap
+
+   LDAP provider configuration. Default ``{}`` (LDAP login disabled). A nonempty
+   mapping installs ``matrix-synapse-ldap3>=0.3.0`` in the Synapse virtual
+   environment and enables its ``LdapAuthProviderModule``. The role sets the
+   provider's ``enabled`` flag automatically. Set the mapping back to ``{}``
+   and rerun the role to disable LDAP login; the package remains installed.
+
+   Configure ``uri``, ``base`` and the ``uid``, ``mail`` and ``name`` attribute
+   mappings. For example, using a service account to search the directory::
+
+      synapse_ldap:
+        uri: ldap://ldap.example.org:389
+        start_tls: true
+        validate_cert: true
+        mode: search
+        base: ou=people,dc=example,dc=org
+        attributes:
+          uid: uid
+          mail: mail
+          name: cn
+        bind_dn: cn=matrix,ou=services,dc=example,dc=org
+        bind_password: "{{ vault_synapse_ldap_password }}"
+
+   Store the bind password in Ansible Vault. The LDAP certificate must be
+   trusted by the host. For LDAPS, use an ``ldaps://`` URI and set
+   ``start_tls: false``. Additional provider settings can be included in this
+   mapping; see the `LDAP provider documentation
+   <https://github.com/matrix-org/matrix-synapse-ldap3>`_.
+
+   Users log in with their LDAP credentials; their Matrix account is created
+   on first successful login even when public registration is disabled.
+   Public-registration email verification does not apply to this provisioning.
+   Local password login remains available. LDAP usernames must not overlap
+   with unrelated local accounts, since the provider can authenticate existing
+   Matrix accounts with matching usernames.
+
+   The provider is in maintenance mode and is incompatible with Matrix
+   Authentication Service (MAS). This role uses Synapse's built-in authentication.
+
 .. data:: synapse_database_name
    synapse_database_user
 

@@ -20,6 +20,21 @@
   when: synapse_registration_requires_email | bool or synapse_email | length > 0
   no_log: true
 
+- name: Check Synapse LDAP settings
+  ansible.builtin.assert:
+    that:
+      - synapse_ldap is mapping
+      - synapse_ldap.uri | default('') | length > 0
+      - synapse_ldap.base | default('') | length > 0
+      - synapse_ldap.attributes is defined
+      - synapse_ldap.attributes is mapping
+      - synapse_ldap.attributes.uid | default('') | length > 0
+      - synapse_ldap.attributes.mail | default('') | length > 0
+      - synapse_ldap.attributes.name | default('') | length > 0
+    fail_msg: Set synapse_ldap uri, base and attributes (uid, mail and name).
+  when: synapse_ldap | length > 0
+  no_log: true
+
 - name: Install Synapse dependencies
   ansible.builtin.apt:
     name:
@@ -108,6 +123,14 @@
     virtualenv_command: /usr/bin/python3 -m venv
     virtualenv_site_packages: true
     umask: "0022"
+  notify: Restart Synapse
+
+- name: Install the Synapse LDAP authentication provider
+  ansible.builtin.pip:
+    name: matrix-synapse-ldap3>=0.3.0
+    virtualenv: /opt/synapse/venv
+    umask: "0022"
+  when: synapse_ldap | length > 0
   notify: Restart Synapse
 
 - name: Create the Synapse database user

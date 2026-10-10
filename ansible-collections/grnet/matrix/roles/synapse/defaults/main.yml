@@ -6,5 +6,6 @@ synapse_report_stats: false
 synapse_enable_registration: false
 synapse_registration_requires_email: false
 synapse_email: {}
+synapse_ldap: {}
 synapse_database_name: synapse
 synapse_database_user: synapse
