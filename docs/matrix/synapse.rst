@@ -23,7 +23,7 @@ configured ``aptiko.general.duply`` installation; set
 The playbook must explicitly run ``aptiko.general.webserver`` before this role
 to install the shared Apache or nginx web server.
 
-Synapse listens on localhost port 8008 with registration disabled. The role
+Synapse listens on localhost port 8008 with registration disabled by default. The role
 configures a reverse proxy through ``aptiko.general.website``,
 forwarding ``/_matrix`` and ``/_synapse/client``
 with the required headers and preserving encoded request paths. The admin API
@@ -115,6 +115,15 @@ Parameters
 .. data:: synapse_report_stats
 
    Whether to report usage statistics to Synapse developers. Default ``false``.
+
+.. data:: synapse_enable_registration
+
+   Whether to allow public account registration. Default ``false``. Set
+   ``synapse_enable_registration: true`` in inventory and rerun the role to
+   enable sign-ups. Registration is enabled without email, CAPTCHA or token
+   verification, allowing anyone to create an account and increasing the risk
+   of spam and abuse. Set it back to ``false`` to disable new sign-ups;
+   existing accounts are unaffected.
 
 .. data:: synapse_database_name
    synapse_database_user
