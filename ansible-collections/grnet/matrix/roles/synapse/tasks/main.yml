@@ -10,6 +10,16 @@
     fail_msg: Set synapse_server_name, synapse_version and synapse_database_password.
   no_log: true
 
+- name: Check Synapse email settings
+  ansible.builtin.assert:
+    that:
+      - synapse_email is mapping
+      - synapse_email.notif_from | default('') is string
+      - synapse_email.notif_from | default('') | trim | length > 0
+    fail_msg: Set synapse_email.notif_from and configure SMTP in synapse_email.
+  when: synapse_registration_requires_email | bool or synapse_email | length > 0
+  no_log: true
+
 - name: Install Synapse dependencies
   ansible.builtin.apt:
     name:

@@ -120,10 +120,42 @@ Parameters
 
    Whether to allow public account registration. Default ``false``. Set
    ``synapse_enable_registration: true`` in inventory and rerun the role to
-   enable sign-ups. Registration is enabled without email, CAPTCHA or token
-   verification, allowing anyone to create an account and increasing the risk
-   of spam and abuse. Set it back to ``false`` to disable new sign-ups;
-   existing accounts are unaffected.
+   enable sign-ups. Unless ``synapse_registration_requires_email`` is enabled,
+   registration requires no verification, increasing the risk of spam and abuse.
+   Set it back to ``false`` to disable new sign-ups; existing accounts are
+   unaffected.
+
+.. data:: synapse_registration_requires_email
+
+   Require new users to verify ownership of an email address during registration.
+   Default ``false``. Requires ``synapse_email`` to be configured. Public
+   registration still requires ``synapse_enable_registration: true``. Existing
+   accounts are not required to verify an email address retroactively.
+
+.. data:: synapse_email
+
+   Mapping passed to Synapse's ``email`` configuration. Default ``{}`` (email
+   sending is not configured). Set ``notif_from`` to the sender address and
+   configure an SMTP server. SMTP defaults to localhost port 25 without
+   authentication; the role does not install a mail server. See the
+   `Synapse email settings <https://element-hq.github.io/synapse/latest/usage/configuration/config_documentation.html#email>`_
+   for all supported keys.
+
+   For example, to enable registration with email verification through an
+   authenticated SMTP server using STARTTLS::
+
+      synapse_enable_registration: true
+      synapse_registration_requires_email: true
+      synapse_email:
+        smtp_host: smtp.example.org
+        smtp_port: 587
+        smtp_user: matrix@example.org
+        smtp_pass: "{{ vault_synapse_smtp_password }}"
+        require_transport_security: true
+        notif_from: "Matrix <matrix@example.org>"
+
+   Store the SMTP password in Ansible Vault. For implicit TLS (usually port
+   465), set ``force_tls: true`` instead of ``require_transport_security``.
 
 .. data:: synapse_database_name
    synapse_database_user
