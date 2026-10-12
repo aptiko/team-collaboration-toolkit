@@ -9,3 +9,4 @@ synapse_email: {}
 synapse_ldap: {}
 synapse_database_name: synapse
 synapse_database_user: synapse
+synapse_mas_enabled: false

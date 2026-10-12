@@ -10,6 +10,17 @@
     fail_msg: Set synapse_server_name, synapse_version and synapse_database_password.
   no_log: true
 
+- name: Check Synapse MAS settings
+  ansible.builtin.assert:
+    that:
+      - mas_synapse_secret | default('') | length >= 32
+      - synapse_ldap | length == 0
+      - not synapse_enable_registration | bool
+      - not synapse_registration_requires_email | bool
+    fail_msg: Set mas_synapse_secret and disable Synapse LDAP and registration settings; configure registration in MAS instead.
+  when: synapse_mas_enabled | bool
+  no_log: true
+
 - name: Check Synapse email settings
   ansible.builtin.assert:
     that:
@@ -127,6 +138,15 @@
     virtualenv_site_packages: true
     umask: "0022"
   notify: Restart Synapse
+
+- name: Check that the installed Synapse supports MAS
+  ansible.builtin.command:
+    argv:
+      - /opt/synapse/venv/bin/python
+      - -c
+      - "from importlib.metadata import version; from packaging.version import Version; assert Version(version('matrix-synapse')) >= Version('1.136.0'), 'MAS requires Synapse >= 1.136.0'"
+  changed_when: false
+  when: synapse_mas_enabled | bool
 
 - name: Install the Synapse LDAP authentication provider
   ansible.builtin.pip:

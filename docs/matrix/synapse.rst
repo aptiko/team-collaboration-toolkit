@@ -200,7 +200,8 @@ Parameters
    Matrix accounts with matching usernames.
 
    The provider is in maintenance mode and is incompatible with Matrix
-   Authentication Service (MAS). This role uses Synapse's built-in authentication.
+   Authentication Service (MAS). Use :doc:`mas` for delegated authentication;
+   LDAP then requires an OIDC bridge such as Dex.
 
 .. data:: synapse_ldap_version
 
@@ -215,3 +216,14 @@ Parameters
 
    Both default to ``synapse``. The database uses UTF-8 encoding and ``C``
    collation, as required by Synapse.
+
+.. data:: synapse_mas_enabled
+
+   Default ``false``. Set to ``true`` to delegate authentication to a local
+   :doc:`mas` instance (Synapse >= 1.136.0 required). Set the same
+   ``mas_synapse_secret`` for both roles. The reverse proxy forwards legacy
+   login, logout and refresh requests to MAS on localhost port 8080.
+   Synapse LDAP and registration settings must remain disabled. Registration
+   is managed in MAS, and Synapse's shared-secret registration is omitted.
+   Existing users and sessions must be migrated before enabling this option;
+   see :doc:`mas`.

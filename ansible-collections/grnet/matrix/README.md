@@ -22,3 +22,9 @@ hostname from the homeserver, even on the same machine.
 
 See the [Element role documentation](https://team-collaboration-toolkit.readthedocs.io/en/latest/matrix/element.html)
 for parameters and a combined Synapse and Element playbook.
+
+The `grnet.matrix.mas` role installs a selected Matrix Authentication Service
+release with a separate PostgreSQL database and Apache/nginx reverse proxy.
+Set `synapse_mas_enabled: true` to delegate Synapse authentication to MAS.
+See the [MAS role documentation](https://team-collaboration-toolkit.readthedocs.io/en/latest/matrix/mas.html)
+for setup, secrets, registration and existing-server migration requirements.
