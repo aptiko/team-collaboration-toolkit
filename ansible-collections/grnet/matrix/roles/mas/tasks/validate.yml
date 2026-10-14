@@ -24,7 +24,10 @@
       - mas_upstream_oauth2_providers is sequence
       - mas_upstream_oauth2_providers is not string
       - mas_upstream_oauth2_providers is not mapping
-    fail_msg: Set a separate mas_fqdn, database and database user, mas_database_password, synapse_server_name and a random mas_synapse_secret of at least 32 characters. MAS requires x86_64 or aarch64.
+    fail_msg: >-
+      Set a separate mas_fqdn, database and database user, mas_database_password,
+      synapse_server_name and a random mas_synapse_secret of at least 32
+      characters. MAS requires x86_64 or aarch64.
   no_log: true
 
 - name: Check MAS registration email settings

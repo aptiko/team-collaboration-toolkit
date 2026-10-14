@@ -161,56 +161,6 @@ Parameters
    Store the SMTP password in Ansible Vault. For implicit TLS (usually port
    465), set ``force_tls: true`` instead of ``require_transport_security``.
 
-.. data:: synapse_ldap
-
-   LDAP provider configuration. Default ``{}`` (LDAP login disabled). A nonempty
-   mapping installs ``matrix-synapse-ldap3`` at ``synapse_ldap_version`` in the Synapse virtual
-   environment and enables its ``LdapAuthProviderModule``. The role sets the
-   provider's ``enabled`` flag automatically. Set the mapping back to ``{}``
-   and rerun the role to disable LDAP login; the package remains installed.
-
-   Configure ``uri``, ``base`` and the ``uid``, ``mail`` and ``name`` attribute
-   mappings. For example, using a service account to search the directory::
-
-      synapse_ldap_version: ">=0.3.0,<0.4.0"
-      synapse_ldap:
-        uri: ldap://ldap.example.org:389
-        start_tls: true
-        validate_cert: true
-        mode: search
-        base: ou=people,dc=example,dc=org
-        attributes:
-          uid: uid
-          mail: mail
-          name: cn
-        bind_dn: cn=matrix,ou=services,dc=example,dc=org
-        bind_password: "{{ vault_synapse_ldap_password }}"
-
-   Store the bind password in Ansible Vault. The LDAP certificate must be
-   trusted by the host. For LDAPS, use an ``ldaps://`` URI and set
-   ``start_tls: false``. Additional provider settings can be included in this
-   mapping; see the `LDAP provider documentation
-   <https://github.com/matrix-org/matrix-synapse-ldap3>`_.
-
-   Users log in with their LDAP credentials; their Matrix account is created
-   on first successful login even when public registration is disabled.
-   Public-registration email verification does not apply to this provisioning.
-   Local password login remains available. LDAP usernames must not overlap
-   with unrelated local accounts, since the provider can authenticate existing
-   Matrix accounts with matching usernames.
-
-   The provider is in maintenance mode and is incompatible with Matrix
-   Authentication Service (MAS). Use :doc:`mas` for delegated authentication;
-   LDAP then requires an OIDC bridge such as Dex.
-
-.. data:: synapse_ldap_version
-
-   Required when ``synapse_ldap`` is nonempty, with no default. A quoted version
-   or version specifier for ``matrix-synapse-ldap3``, for example ``"0.3.0"`` or
-   ``">=0.3.0,<0.4.0"``. Uses the same installation behavior as
-   ``synapse_version``. Select a release supporting ``LdapAuthProviderModule``
-   and compatible with your Synapse and Python versions.
-
 .. data:: synapse_database_name
    synapse_database_user
 
@@ -219,11 +169,10 @@ Parameters
 
 .. data:: synapse_mas_enabled
 
-   Default ``false``. Set to ``true`` to delegate authentication to a local
+   When ``true`` (the default), it delegates authentication to a local
    :doc:`mas` instance (Synapse >= 1.136.0 required). Set the same
-   ``mas_synapse_secret`` for both roles. The reverse proxy forwards legacy
+   ``mas_synapse_secret`` for both roles. The reverse proxy forwards
    login, logout and refresh requests to MAS on localhost port 8080.
-   Synapse LDAP and registration settings must remain disabled. Registration
-   is managed in MAS, and Synapse's shared-secret registration is omitted.
-   Existing users and sessions must be migrated before enabling this option;
-   see :doc:`mas`.
+
+   Set to ``false`` to use Synapse's built-in authentication. This is not
+   recommended and it might not be well tested.

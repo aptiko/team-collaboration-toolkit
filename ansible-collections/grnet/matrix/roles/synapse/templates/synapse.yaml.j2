@@ -12,12 +12,6 @@ registration_shared_secret_path: /var/opt/synapse/registration_shared_secret
 email:
 {{ synapse_email | to_nice_yaml(indent=2) | indent(2, true) }}
 {% endif %}
-{% if synapse_ldap %}
-modules:
-  - module: ldap_auth_provider.LdapAuthProviderModule
-    config:
-{{ synapse_ldap | combine({'enabled': true}) | to_nice_yaml(indent=2) | indent(6, true) }}
-{% endif %}
 media_store_path: /var/opt/synapse/media_store
 signing_key_path: /var/opt/synapse/homeserver.signing.key
 

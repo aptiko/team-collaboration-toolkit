@@ -3,9 +3,9 @@ mas
 ===
 
 ``grnet.matrix.mas`` installs an explicitly selected Matrix Authentication
-Service (MAS) release from the upstream Linux binaries, on x86_64 or aarch64.
-It runs alongside Synapse on the same server, with a separate PostgreSQL
-database and its own hostname. Run ``aptiko.general.postgresql`` and
+Service (MAS) release from the upstream Linux binaries.  It runs alongside
+Synapse on the same server, with a separate PostgreSQL database and its
+own hostname. Run ``aptiko.general.postgresql`` and
 ``aptiko.general.webserver`` first, as described in :doc:`synapse`.
 
 MAS listens on ``127.0.0.1:8080`` behind Apache or nginx. The role manages
@@ -43,9 +43,9 @@ Use Synapse 1.136.0 or later. For example::
 DNS for both hostnames must point to this server. Ports 80 and 443 must be
 reachable for Let's Encrypt. Client and federation discovery on the
 server-name domain remain the administrator's responsibility; see
-:doc:`synapse`. Element needs no additional role settings for MAS.
+:doc:`synapse`.
 
-``synapse_mas_enabled`` enables delegation and routes legacy login, logout and
+``synapse_mas_enabled`` enables delegation and routes login, logout and
 refresh requests on the Synapse hostname to MAS. The same
 ``mas_synapse_secret`` is used by both services. Keep Synapse's LDAP and
 registration options disabled; MAS owns authentication and registration.
@@ -88,8 +88,8 @@ Parameters
    intended only for local testing.
 
 .. data:: mas_database_name
-            mas_database_user
-            mas_database_password
+          mas_database_user
+          mas_database_password
 
    Database and user default to ``mas``; the password is required. Both the
    database and user must differ from Synapse's. PostgreSQL is local.
@@ -100,7 +100,7 @@ Parameters
    Keep it in Ansible Vault. It authorizes administrative operations.
 
 .. data:: mas_enable_registration
-            mas_registration_requires_email
+          mas_registration_requires_email
 
    Defaults: ``false`` and ``true``. Email-required registration needs a
    working ``mas_email`` transport. Set ``mas_registration_requires_email``
@@ -119,8 +119,8 @@ Parameters
    MAS's ``upstream_oauth2.providers``; see the upstream
    `provider configuration
    <https://element-hq.github.io/matrix-authentication-service/reference/configuration.html#upstream_oauth2providers>`_.
-   LDAP requires an OIDC bridge such as Dex, installed separately. MAS cannot
-   use ``synapse_ldap``. Use Ansible's ``!unsafe`` tag on provider claim
+   LDAP requires an OIDC bridge such as Dex, installed separately.
+   Use Ansible's ``!unsafe`` tag on provider claim
    templates containing literal ``{{ ... }}`` so Ansible leaves them for MAS.
    Removing a provider from inventory does not delete its database entry;
    review MAS's ``config sync --prune`` procedure when removing providers.
@@ -154,15 +154,3 @@ in ``/var/opt/mas/generated.yaml`` before the first role run.
 Migrated password hashes and upstream identity mappings may need additional
 MAS configuration beyond this role's fresh-install defaults. Review those
 requirements before adopting the role for a migrated installation.
-
-Validation
-==========
-
-The role runs ``mas-cli config check`` before replacing the configuration.
-Local tests (Ansible, Jinja2 and PyYAML required), from the repository root::
-
-  ANSIBLE_LOCAL_TEMP=/tmp/ansible python -m unittest discover -s ansible-collections/grnet/matrix/roles/mas/tests
-
-After deployment, verify OIDC discovery at
-``https://<mas_fqdn>/.well-known/openid-configuration`` and legacy login at
-``https://<synapse_fqdn>/_matrix/client/v3/login``, then log in with Element.

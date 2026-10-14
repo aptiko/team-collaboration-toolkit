@@ -26,7 +26,8 @@
 
 - name: Download and extract the selected MAS release
   ansible.builtin.unarchive:
-    src: "https://github.com/element-hq/matrix-authentication-service/releases/download/v{{ mas_version }}/mas-cli-{{ ansible_facts.architecture }}-linux.tar.gz"
+    src: >
+      https://github.com/element-hq/matrix-authentication-service/releases/download/v{{ mas_version }}/mas-cli-{{ ansible_facts.architecture }}-linux.tar.gz
     dest: "/opt/mas/{{ mas_version }}"
     remote_src: true
     owner: root
@@ -118,11 +119,9 @@
     mode: "0644"
   notify: "{{ 'Restart web server' if webserver_type == 'apache' else 'Reload web server' }}"
 
-- name: Apply MAS and reverse proxy configuration
-  ansible.builtin.meta: flush_handlers
-
 - name: Enable and start MAS
-  ansible.builtin.service:
+  ansible.builtin.systemd_service:
     name: matrix-authentication-service
+    daemon-reload: true
     enabled: true
     state: started
