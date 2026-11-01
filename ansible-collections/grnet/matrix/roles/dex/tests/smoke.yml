@@ -1,0 +1,16 @@
+---
+# Run against an installed server using its normal inventory variables.
+- hosts: all
+  gather_facts: false
+  tasks:
+    - name: Check public Dex discovery
+      ansible.builtin.uri:
+        url: "https://{{ dex_fqdn }}/.well-known/openid-configuration"
+        return_content: true
+      register: dex_discovery
+
+    - name: Check the issuer and authorization endpoint
+      ansible.builtin.assert:
+        that:
+          - dex_discovery.json.issuer == 'https://' ~ dex_fqdn
+          - dex_discovery.json.authorization_endpoint == 'https://' ~ dex_fqdn ~ '/auth'
