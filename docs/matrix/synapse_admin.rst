@@ -18,9 +18,11 @@ API access and authentication
 
 The administrator's browser must be able to reach both ``/_matrix`` and
 ``/_synapse/admin`` at ``synapse_admin_homeserver_url``. The :doc:`synapse`
-role does not proxy the admin API. Configure access separately, preferably
-through a private network or an access-restricted reverse proxy. Installing
-this static interface does not expose the API or grant administrator rights.
+role proxies the admin API when ``synapse_expose_admin_api: true`` is set.
+Set this in inventory and rerun the Synapse role, then point
+``synapse_admin_homeserver_url`` to your usual Synapse HTTPS URL.
+The setting defaults to ``false``. Installing only this static interface
+does not expose the API or grant administrator rights.
 The ``restrictBaseUrl`` setting controls the interface's homeserver selection;
 it is not an access control for the API.
 
@@ -36,18 +38,22 @@ interface needs an HTTPS homeserver URL to avoid browser mixed-content blocking.
 Example
 =======
 
-After arranging admin API access at ``matrix-admin-api.example.org``::
+For an existing Synapse installation, retain its inventory settings (including
+its version, database credentials and MAS settings) and run both roles::
 
   - hosts: matrix
     become: true
     vars:
       webserver_type: nginx
       website_letsencrypt_admin: admin@example.org
+      synapse_fqdn: matrix.example.org
+      synapse_expose_admin_api: true
       synapse_admin_version: "0.11.4"
       synapse_admin_fqdn: matrix-admin.example.org
-      synapse_admin_homeserver_url: https://matrix-admin-api.example.org
+      synapse_admin_homeserver_url: https://matrix.example.org
     roles:
       - aptiko.general.webserver
+      - grnet.matrix.synapse
       - grnet.matrix.synapse_admin
 
 Parameters
@@ -70,6 +76,10 @@ Parameters
 
    Required. Absolute HTTP(S) URL exposing the homeserver's client and admin
    APIs to the administrator's browser.
+   For example, ``https://matrix.example.org`` when the Synapse role uses
+   ``synapse_fqdn: matrix.example.org`` and ``synapse_expose_admin_api: true``.
+   Supply the base URL without ``/_matrix`` or ``/_synapse/admin``. Requests
+   come directly from the browser, so this must be a browser-reachable address.
 
 .. data:: synapse_admin_ssl
 
