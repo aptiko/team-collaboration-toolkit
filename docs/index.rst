@@ -42,6 +42,7 @@ Debian. Start reading from :ref:`guide_nextcloud`.
    matrix/mas
    matrix/dex
    matrix/element
+   matrix/synapse_admin
 
 .. toctree::
    :maxdepth: 1

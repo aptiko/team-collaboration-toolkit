@@ -30,3 +30,8 @@ The `grnet.matrix.mas` role installs a selected Matrix Authentication Service
 release with a separate PostgreSQL database and Apache/nginx reverse proxy.
 See the [MAS role documentation](https://team-collaboration-toolkit.readthedocs.io/en/latest/matrix/mas.html)
 for setup, secrets, registration and existing-server migration requirements.
+
+The `grnet.matrix.synapse_admin` role installs a selected Synapse Admin web
+release with Apache/nginx and a configured homeserver. See the
+[Synapse Admin role documentation](https://team-collaboration-toolkit.readthedocs.io/en/latest/matrix/synapse_admin.html)
+for parameters and the required browser access to the Synapse admin API.

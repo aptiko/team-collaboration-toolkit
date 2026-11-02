@@ -1,0 +1,31 @@
+---
+# Run against a deployed host with synapse_admin_* settings in inventory.
+- name: Check the deployed Synapse Admin website
+  hosts: all
+  gather_facts: false
+  vars_files:
+    - ../defaults/main.yml
+  vars:
+    synapse_admin_test_url: "{{ 'http' if synapse_admin_ssl == 'off' else 'https' }}://{{ synapse_admin_fqdn }}"
+  tasks:
+    - name: Fetch the Synapse Admin entry point
+      ansible.builtin.uri:
+        url: "{{ synapse_admin_test_url }}/"
+        validate_certs: "{{ synapse_admin_ssl != 'self-signed' }}"
+        return_content: true
+      register: synapse_admin_page
+
+    - name: Fetch the Synapse Admin configuration
+      ansible.builtin.uri:
+        url: "{{ synapse_admin_test_url }}/config.json"
+        validate_certs: "{{ synapse_admin_ssl != 'self-signed' }}"
+      register: synapse_admin_config
+
+    - name: Check content, homeserver and headers
+      ansible.builtin.assert:
+        that:
+          - "'text/html' in synapse_admin_page.content_type"
+          - "'no-cache' in synapse_admin_page.cache_control"
+          - synapse_admin_page.x_content_type_options == 'nosniff'
+          - synapse_admin_config.json.restrictBaseUrl == synapse_admin_homeserver_url
+          - "'no-cache' in synapse_admin_config.cache_control"

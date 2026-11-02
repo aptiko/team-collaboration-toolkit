@@ -1,0 +1,26 @@
+---
+- name: Check required Synapse Admin settings
+  ansible.builtin.assert:
+    that:
+      - synapse_admin_version is defined
+      - synapse_admin_version is string
+      - synapse_admin_version is match('^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.-]+)?$')
+      - synapse_admin_fqdn is defined
+      - synapse_admin_fqdn is string
+      - synapse_admin_fqdn is match('^[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?)+\.?$')
+      - synapse_admin_homeserver_url is defined
+      - synapse_admin_homeserver_url is string
+      - (synapse_admin_homeserver_url | ansible.builtin.urlsplit('scheme')) in ['http', 'https']
+      - (synapse_admin_homeserver_url | ansible.builtin.urlsplit('hostname') | default('', true)) | length > 0
+    fail_msg: Set synapse_admin_version, synapse_admin_fqdn and an absolute HTTP(S) synapse_admin_homeserver_url.
+
+- name: Require separate Synapse Admin and homeserver hostnames
+  ansible.builtin.assert:
+    that:
+      - >-
+        synapse_admin_fqdn | lower | regex_replace('\.$', '') !=
+        synapse_admin_homeserver_url | ansible.builtin.urlsplit('hostname') | lower | regex_replace('\.$', '')
+      - >-
+        synapse_admin_fqdn | lower | regex_replace('\.$', '') !=
+        synapse_fqdn | default('') | lower | regex_replace('\.$', '')
+    fail_msg: Synapse Admin must use a different hostname from Synapse, even on the same server.

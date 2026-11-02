@@ -1,0 +1,46 @@
+---
+- name: Validate Synapse Admin settings
+  ansible.builtin.import_tasks: validate.yml
+
+- name: Install archive and download dependencies
+  ansible.builtin.apt:
+    name:
+      - ca-certificates
+      - tar
+
+- name: Download and extract the selected Synapse Admin release
+  ansible.builtin.unarchive:
+    src: "https://github.com/Awesome-Technologies/synapse-admin/releases/download/{{ synapse_admin_version }}/synapse-admin-{{ synapse_admin_version }}.tar.gz"
+    dest: "/var/www/{{ synapse_admin_fqdn }}"
+    remote_src: true
+    owner: root
+    group: root
+    creates: "/var/www/{{ synapse_admin_fqdn }}/synapse-admin-{{ synapse_admin_version }}/index.html"
+
+- name: Configure Synapse Admin's homeserver
+  ansible.builtin.copy:
+    content: "{{ {'restrictBaseUrl': synapse_admin_homeserver_url} | ansible.builtin.to_nice_json }}\n"
+    dest: "/var/www/{{ synapse_admin_fqdn }}/synapse-admin-{{ synapse_admin_version }}/config.json"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Configure Apache for Synapse Admin
+  ansible.builtin.template:
+    src: synapse_admin.apache.conf.j2
+    dest: "/etc/apache2/snippets/{{ synapse_admin_fqdn }}/synapse_admin.conf"
+    owner: root
+    group: root
+    mode: "0644"
+  when: webserver_type == 'apache'
+  notify: Restart web server
+
+- name: Configure nginx for Synapse Admin
+  ansible.builtin.template:
+    src: synapse_admin.nginx.conf.j2
+    dest: "/etc/nginx/snippets/{{ synapse_admin_fqdn }}/synapse_admin.conf"
+    owner: root
+    group: root
+    mode: "0644"
+  when: webserver_type == 'nginx'
+  notify: Reload web server
